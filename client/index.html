@@ -1,33 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Vite + Vue + TS</title>
-	<style>
-		html,
-		body {
-			padding: 0;
-			margin: 0;
-			width: 100%;
-			height: 100%;
-			font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-		}
-
-		#container {
-			width: 100%;
-			height: 100%;
-			box-sizing: border-box;
-		}
-	</style>
-  <script type="module" src="/assets/index-206af6cc.js"></script>
-  <link rel="stylesheet" href="/assets/index-7ba2475f.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Editor</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
-	<div id="container"></div>
-	
-</body>
+    <div class="editor-container">
+        <div class="tab-header">
+            <!-- Tabs will be added here dynamically -->
+        </div>
+        <div class="tab-content">
+            <!-- Tab content (textareas) will be added here -->
+        </div>
+        <button id="new-tab">New Tab</button>
+        <button id="save">Save</button>
+    </div>
 
+    <!-- Inline JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabHeader = document.querySelector('.tab-header');
+            const tabContent = document.querySelector('.tab-content');
+            const newTabBtn = document.getElementById('new-tab');
+            const saveBtn = document.getElementById('save');
+            let tabCount = 0;
+
+            // Create initial tab
+            addTab();
+
+            // Event listeners
+            newTabBtn.addEventListener('click', addTab);
+            saveBtn.addEventListener('click', saveText);
+
+            function addTab() {
+                tabCount++;
+
+                // Create tab button
+                const tab = document.createElement('div');
+                tab.classList.add('tab');
+                tab.textContent = `Tab ${tabCount}`;
+                tab.dataset.tabId = tabCount;
+                tab.addEventListener('click', switchTab);
+                tabHeader.appendChild(tab);
+
+                // Create tab content
+                const tabPane = document.createElement('div');
+                tabPane.classList.add('tab-pane');
+                tabPane.id = `tab-${tabCount}`;
+                const textarea = document.createElement('textarea');
+                textarea.id = `editor-${tabCount}`;
+                tabPane.appendChild(textarea);
+                tabContent.appendChild(tabPane);
+
+                // Activate the new tab
+                switchTab({ target: tab });
+            }
+
+            function switchTab(event) {
+                // Deactivate all tabs and panes
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+                // Activate clicked tab and its content
+                const tab = event.target;
+                tab.classList.add('active');
+                const tabId = tab.dataset.tabId;
+                const pane = document.getElementById(`tab-${tabId}`);
+                pane.classList.add('active');
+            }
+
+            function saveText() {
+                const activePane = document.querySelector('.tab-pane.active textarea');
+                if (activePane) {
+                    const text = activePane.value;
+                    localStorage.setItem(`savedText-${activePane.id}`, text);
+                    alert('Text saved!');
+                }
+            }
+        });
+    </script>
+</body>
 </html>
